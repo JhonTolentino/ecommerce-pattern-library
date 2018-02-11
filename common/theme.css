@@ -43,6 +43,7 @@ cite,
 blockquote {
   font-style: italic;
 }
+
 mark {
-  color: var(--color-secondary: #a98d68)
+  color: var(--color-secondary: #a98d68);
 }
