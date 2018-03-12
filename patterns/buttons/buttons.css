@@ -3,18 +3,52 @@
   border-color: var(--color-secondary);
 
   color: #fff;
+
+  border-radius: 0.2em;
+  padding: 10px 24px;
+  text-decoration: none;
+  text-align: center;
 }
 
 .btn-light {
-  background-color: var(--color-secondary-light);
-  border-color: var(--color-secondary-light);
+  background-color: var(--color-third);
+  border-color: var(--color-third);
 
   color: #fff;
+  border-radius: 0.2em;
+  padding: 0.7em 1.7em;
+  text-decoration: none;
+  text-align: center;
 }
 
 .btn-ghost {
   background-color: transparent;
+  border-color: var(--color-third);
+
+  color: #fff;
+  border-radius: 0.2em;
+  padding: 0.7em 1.7em;
+  text-decoration: none;
+    text-align: center;
+}
+
+.btn:hover {
+  background-color: black;
+  border-color: black;
+
+  color: var(--color-primary);
+}
+
+.btn-light:hover {
+  background-color: var(--color-secondary);
   border-color: var(--color-secondary);
 
-  color: var(--color-secondary);
+  color: var(--color-primary);
+}
+
+.btn-ghost:hover {
+  background-color: transparent;
+  border-color: var(--color-secondary);
+
+  color: var(--color-primary);
 }
