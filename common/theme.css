@@ -1,49 +1,65 @@
 :root {
-  --color-primary: #e0d7d2;
-  --color-secondary: #a98d68;
-  --font-primary: "Oswald", sans-serif;
-  --font-secondary: "Lato", sans-serif;
+  --color-primary: #f96552;
+  --color-secondary: #909090;
+  --color-third: #fafafc;
+  --font-primary: "Amatic SC", cursive;
+  --font-secondary: "Oswald", sans-serif;
 }
 
 html {
-  font-family: var(--font-primary);
+  font-family: var(--font-secondary);
 }
 
-h1,
+h1 {
+  font-family: var(--font-primary);
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
 h2,
 h3,
 h4,
 h5 {
-  font-family: var(--font-secondary);
-  color: var(--color-secondary);
-  font-weight: bold;
+  font-family: var(--font-primary);
+  color: var(--color-primary);
 }
 
 ul,
 ol,
 dl,
-dfn,
-u,
-s {
-  font-weight: lighter;
-}
-
 strong,
 em,
-abbr,
-del,
-ins,
-b,
-q {
+b {
   font-weight: bold;
 }
 
+s,
+del {
+  text-decoration: line-through;
+}
+
+u,
+ins {
+  text-decoration: underline;
+}
+
+dfn {
+  font-weight: lighter;
+}
+
+abbr {
+  font-weight: normal;
+}
+
+
+q,
 i,
 cite,
 blockquote {
+  font-weight: lighter;
   font-style: italic;
 }
 
 mark {
-  color: var(--color-secondary: #a98d68);
+  color: var(--color-primary: #f96552;);
 }
