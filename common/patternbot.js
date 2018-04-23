@@ -101,7 +101,6 @@ const patternBotIncludes = function (manifest) {
     for (i = 0; i < t; i++) {
       if (rootMatcher.test(allScripts[i].src)) {
         return allScripts[i].src.split(rootMatcher)[0];
-        break;
       }
     }
   };
@@ -143,7 +142,7 @@ const patternBotIncludes = function (manifest) {
     let patternInfoJson;
     const data = patternElem.innerText.trim();
 
-    if (!data) return {}
+    if (!data) return {};
 
     try {
       patternInfoJson = JSON.parse(data);
@@ -172,9 +171,50 @@ const patternBotIncludes = function (manifest) {
     };
   };
 
+  const correctHrefPaths = function (html) {
+    const hrefSearch = /href\s*=\s*"\.\.\/\.\.\//g;
+    const srcSearch = /src\s*=\s*"\.\.\/\.\.\//g;
+    const urlSearch = /url\((["']*)\.\.\/\.\.\//g;
+
+    return html
+      .replace(hrefSearch, 'href="../')
+      .replace(srcSearch, 'src="../')
+      .replace(urlSearch, 'url($1../')
+    ;
+  };
+
+  const buildAccurateSelectorFromElem = function (elem) {
+    let theSelector = elem.tagName.toLowerCase();
+
+    if (elem.id) theSelector += `#${elem.id}`;
+    if (elem.getAttribute('role')) theSelector += `[role="${elem.getAttribute('role')}"]`;
+    if (elem.classList.length > 0) theSelector += `.${[].join.call(elem.classList, '.')}`;
+
+    theSelector += ':first-of-type';
+
+    return theSelector;
+  };
+
+  /**
+   * This is an ugly mess: Blink does not properly render SVGs when using DOMParser alone.
+   * But, I need DOMParser to determine the correct element to extract.
+   *
+   * I only want to get the first element within the `<body>` tag of the loaded document.
+   * This dumps the whole, messy, HTML document into a temporary `<div>`,
+   * then uses the DOMParser version, of the same element, to create an accurate selector,
+   * then finds that single element in the temporary `<div>` using the selector and returns it.
+   */
   const htmlStringToElem = function (html) {
+    let theSelector = '';
+    const tmpDoc = document.createElement('div');
+    const finalTmpDoc = document.createElement('div');
     const doc = (new DOMParser()).parseFromString(html, 'text/html');
-    return doc.body;
+
+    tmpDoc.innerHTML = html;
+    theSelector = buildAccurateSelectorFromElem(doc.body.firstElementChild);
+    finalTmpDoc.appendChild(tmpDoc.querySelector(theSelector));
+
+    return finalTmpDoc;
   };
 
   const replaceElementValue = function (elem, sel, data) {
@@ -197,7 +237,7 @@ const patternBotIncludes = function (manifest) {
 
     if (!patternDetails.html) return;
 
-    patternOutElem = htmlStringToElem(patternDetails.html);
+    patternOutElem = htmlStringToElem(correctHrefPaths(patternDetails.html));
     patternData = getPatternInfo(patternElem);
 
     Object.keys(patternData).forEach((sel) => {
@@ -234,7 +274,7 @@ const patternBotIncludes = function (manifest) {
   };
 
   const hideLoadingScreen = function () {
-    const allDownloadedInterval = setInterval(() => {
+    let allDownloadedInterval = setInterval(() => {
       if (Object.values(downloadedAssets).includes(false)) return;
 
       clearInterval(allDownloadedInterval);
@@ -272,7 +312,7 @@ const patternBotIncludes = function (manifest) {
           if (resp.status >= 200 && resp.status <= 299) {
             return resp.text();
           } else {
-            console.group('Cannot location pattern');
+            console.group('Cannot locate pattern');
             console.log(resp.url);
             console.log(`Error ${resp.status}: ${resp.statusText}`);
             console.groupEnd();
@@ -347,10 +387,10 @@ const patternBotIncludes = function (manifest) {
 
 /** 
  * Patternbot library manifest
- * /Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library
- * @version 1520832950822
+ * /Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound
+ * @version 1524458125639
  */
-const patternManifest_1520832950822 = {
+const patternManifest_1524458125638 = {
   "commonInfo": {
     "modulifier": [
       "responsive",
@@ -418,18 +458,46 @@ const patternManifest_1520832950822 = {
           {
             "name": "--color-primary",
             "namePretty": "Primary",
-            "raw": "#f96552",
-            "hex": "#f96552",
-            "rgba": "rgba(249, 101, 82, 1)"
+            "raw": "#fcbeb6",
+            "hex": "#fcbeb6",
+            "rgba": "rgba(252, 190, 182, 1)"
+          },
+          {
+            "name": "--color-primary-dark",
+            "namePretty": "Primary dark",
+            "raw": "#f86754",
+            "hex": "#f86754",
+            "rgba": "rgba(248, 103, 84, 1)"
+          },
+          {
+            "name": "--color-primary-light",
+            "namePretty": "Primary light",
+            "raw": "#fee9e7",
+            "hex": "#fee9e7",
+            "rgba": "rgba(254, 233, 231, 1)"
           }
         ],
         "secondary": [
           {
             "name": "--color-secondary",
             "namePretty": "Secondary",
+            "raw": "#bfbfbf",
+            "hex": "#bfbfbf",
+            "rgba": "rgba(191, 191, 191, 1)"
+          },
+          {
+            "name": "--color-secondary-dark",
+            "namePretty": "Secondary dark",
             "raw": "#909090",
             "hex": "#909090",
             "rgba": "rgba(144, 144, 144, 1)"
+          },
+          {
+            "name": "--color-secondary-light",
+            "namePretty": "Secondary light",
+            "raw": "#f2f2f2",
+            "hex": "#f2f2f2",
+            "rgba": "rgba(242, 242, 242, 1)"
           }
         ],
         "neutral": [],
@@ -445,14 +513,29 @@ const patternManifest_1520832950822 = {
       },
       "fonts": {},
       "coloursRaw": {
-        "--color-primary": "#f96552",
-        "--color-secondary": "#909090",
+        "--color-primary": "#fcbeb6",
+        "--color-primary-dark": "#f86754",
+        "--color-primary-light": "#fee9e7",
+        "--color-secondary": "#bfbfbf",
+        "--color-secondary-dark": "#909090",
+        "--color-secondary-light": "#f2f2f2",
         "--color-third": "#fafafc"
       }
     },
     "readme": {
       "attributes": {}
     },
+    "icons": [
+      "alert",
+      "fb",
+      "fullstar",
+      "cart",
+      "halfstar",
+      "mobmenu",
+      "ig",
+      "nostar",
+      "tw"
+    ],
     "interfaceColours": {
       "primary": 0,
       "opposite": 255
@@ -460,39 +543,122 @@ const patternManifest_1520832950822 = {
   },
   "patternLibFiles": {
     "commonParsable": {
-      "gridifier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/common/grid.css",
-      "typografier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/common/type.css",
-      "modulifier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/common/modules.css",
-      "theme": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/common/theme.css"
+      "gridifier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/common/grid.css",
+      "typografier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/common/type.css",
+      "modulifier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/common/modules.css",
+      "theme": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/common/theme.css"
     },
     "imagesParsable": {
-      "icons": false
+      "icons": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/icons.svg"
     },
     "logos": {
-      "sizeLarge": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/images/logo-256.svg",
-      "size64": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/images/logo-64.svg",
-      "size32": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/images/logo-32.svg",
-      "size16": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/images/logo-16.svg",
+      "sizeLarge": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/logo-256.svg",
+      "size64": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/logo-64.svg",
+      "size32": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/logo-32.svg",
+      "size16": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/logo-16.svg",
       "size16Local": "logo-16.svg",
       "sizeLargeLocal": "logo-256.svg",
       "size32Local": "logo-32.svg",
       "size64Local": "logo-64.svg"
     },
     "patterns": [
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/patterns/buttons"
+      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner",
+      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons",
+      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards",
+      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer",
+      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms",
+      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header",
+      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/navigation",
+      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections"
     ],
-    "pages": []
+    "pages": [
+      {
+        "name": "about.html",
+        "namePretty": "About",
+        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/about.html"
+      },
+      {
+        "name": "checkout.html",
+        "namePretty": "Checkout",
+        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/checkout.html"
+      },
+      {
+        "name": "contact.html",
+        "namePretty": "Contact",
+        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/contact.html"
+      },
+      {
+        "name": "home.html",
+        "namePretty": "Home",
+        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/home.html"
+      },
+      {
+        "name": "news.html",
+        "namePretty": "News",
+        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/news.html"
+      },
+      {
+        "name": "product.html",
+        "namePretty": "Product",
+        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/product.html"
+      },
+      {
+        "name": "productlist.html",
+        "namePretty": "Productlist",
+        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/productlist.html"
+      }
+    ]
   },
   "userPatterns": [
     {
+      "name": "banner",
+      "namePretty": "Banner",
+      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner",
+      "html": [
+        {
+          "name": "banner",
+          "namePretty": "Banner",
+          "filename": "banner",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner/banner.html",
+          "localPath": "patterns/banner/banner.html"
+        },
+        {
+          "name": "basic-banner",
+          "namePretty": "Basic banner",
+          "filename": "basic-banner",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner/basic-banner.html",
+          "localPath": "patterns/banner/basic-banner.html"
+        }
+      ],
+      "md": [
+        {
+          "name": "readme",
+          "namePretty": "Readme",
+          "filename": "README",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner/README.md",
+          "localPath": "patterns/banner/README.md"
+        }
+      ],
+      "css": [
+        {
+          "name": "banner",
+          "namePretty": "Banner",
+          "filename": "banner",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner/banner.css",
+          "localPath": "patterns/banner/banner.css"
+        }
+      ]
+    },
+    {
       "name": "buttons",
       "namePretty": "Buttons",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/patterns/buttons",
+      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons",
       "html": [
         {
           "name": "buttons",
           "namePretty": "Buttons",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/patterns/buttons/buttons.html",
+          "filename": "buttons",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons/buttons.html",
           "localPath": "patterns/buttons/buttons.html"
         }
       ],
@@ -500,7 +666,8 @@ const patternManifest_1520832950822 = {
         {
           "name": "read",
           "namePretty": "Read",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/patterns/buttons/READ.md",
+          "filename": "READ",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons/READ.md",
           "localPath": "patterns/buttons/READ.md"
         }
       ],
@@ -508,8 +675,248 @@ const patternManifest_1520832950822 = {
         {
           "name": "buttons",
           "namePretty": "Buttons",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/ecommerce-pattern-library/patterns/buttons/buttons.css",
+          "filename": "buttons",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons/buttons.css",
           "localPath": "patterns/buttons/buttons.css"
+        }
+      ]
+    },
+    {
+      "name": "cards",
+      "namePretty": "Cards",
+      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards",
+      "html": [
+        {
+          "name": "card",
+          "namePretty": "Card",
+          "filename": "card",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/card.html",
+          "localPath": "patterns/cards/card.html"
+        },
+        {
+          "name": "feature-card",
+          "namePretty": "Feature card",
+          "filename": "feature-card",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/feature-card.html",
+          "localPath": "patterns/cards/feature-card.html"
+        },
+        {
+          "name": "product-card",
+          "namePretty": "Product card",
+          "filename": "product-card",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/product-card.html",
+          "localPath": "patterns/cards/product-card.html"
+        },
+        {
+          "name": "product-detail-card",
+          "namePretty": "Product detail card",
+          "filename": "product-detail-card",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/product-detail-card.html",
+          "localPath": "patterns/cards/product-detail-card.html"
+        }
+      ],
+      "md": [
+        {
+          "name": "readme",
+          "namePretty": "Readme",
+          "filename": "README",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/README.md",
+          "localPath": "patterns/cards/README.md"
+        }
+      ],
+      "css": [
+        {
+          "name": "card",
+          "namePretty": "Card",
+          "filename": "card",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/card.css",
+          "localPath": "patterns/cards/card.css"
+        }
+      ]
+    },
+    {
+      "name": "footer",
+      "namePretty": "Footer",
+      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer",
+      "html": [
+        {
+          "name": "footer",
+          "namePretty": "Footer",
+          "filename": "footer",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer/footer.html",
+          "localPath": "patterns/footer/footer.html"
+        }
+      ],
+      "md": [
+        {
+          "name": "readme",
+          "namePretty": "Readme",
+          "filename": "README",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer/README.md",
+          "localPath": "patterns/footer/README.md"
+        }
+      ],
+      "css": [
+        {
+          "name": "footer",
+          "namePretty": "Footer",
+          "filename": "footer",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer/footer.css",
+          "localPath": "patterns/footer/footer.css"
+        }
+      ]
+    },
+    {
+      "name": "forms",
+      "namePretty": "Forms",
+      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms",
+      "html": [
+        {
+          "name": "checkbox",
+          "namePretty": "Checkbox",
+          "filename": "checkbox",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/checkbox.html",
+          "localPath": "patterns/forms/checkbox.html"
+        },
+        {
+          "name": "email",
+          "namePretty": "Email",
+          "filename": "email",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/email.html",
+          "localPath": "patterns/forms/email.html"
+        },
+        {
+          "name": "name",
+          "namePretty": "Name",
+          "filename": "name",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/name.html",
+          "localPath": "patterns/forms/name.html"
+        },
+        {
+          "name": "number",
+          "namePretty": "Number",
+          "filename": "number",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/number.html",
+          "localPath": "patterns/forms/number.html"
+        },
+        {
+          "name": "password",
+          "namePretty": "Password",
+          "filename": "password",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/password.html",
+          "localPath": "patterns/forms/password.html"
+        },
+        {
+          "name": "phone-number",
+          "namePretty": "Phone number",
+          "filename": "phone-number",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/phone-number.html",
+          "localPath": "patterns/forms/phone-number.html"
+        },
+        {
+          "name": "radio-buttons",
+          "namePretty": "Radio buttons",
+          "filename": "radio-buttons",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/radio-buttons.html",
+          "localPath": "patterns/forms/radio-buttons.html"
+        }
+      ],
+      "md": [],
+      "css": [
+        {
+          "name": "forms",
+          "namePretty": "Forms",
+          "filename": "forms",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/forms.css",
+          "localPath": "patterns/forms/forms.css"
+        }
+      ]
+    },
+    {
+      "name": "header",
+      "namePretty": "Header",
+      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header",
+      "html": [
+        {
+          "name": "header",
+          "namePretty": "Header",
+          "filename": "header",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header/header.html",
+          "localPath": "patterns/header/header.html"
+        }
+      ],
+      "md": [
+        {
+          "name": "readme",
+          "namePretty": "Readme",
+          "filename": "README",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header/README.md",
+          "localPath": "patterns/header/README.md"
+        }
+      ],
+      "css": [
+        {
+          "name": "header",
+          "namePretty": "Header",
+          "filename": "header",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header/header.css",
+          "localPath": "patterns/header/header.css"
+        }
+      ]
+    },
+    {
+      "name": "navigation",
+      "namePretty": "Navigation",
+      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/navigation",
+      "html": [
+        {
+          "name": "nav",
+          "namePretty": "Nav",
+          "filename": "nav",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/navigation/nav.html",
+          "localPath": "patterns/navigation/nav.html"
+        }
+      ],
+      "md": [],
+      "css": [
+        {
+          "name": "nav",
+          "namePretty": "Nav",
+          "filename": "nav",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/navigation/nav.css",
+          "localPath": "patterns/navigation/nav.css"
+        }
+      ]
+    },
+    {
+      "name": "sections",
+      "namePretty": "Sections",
+      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections",
+      "html": [
+        {
+          "name": "section",
+          "namePretty": "Section",
+          "filename": "section",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections/section.html",
+          "localPath": "patterns/sections/section.html"
+        }
+      ],
+      "md": [
+        {
+          "name": "readme",
+          "namePretty": "Readme",
+          "filename": "README",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections/README.md",
+          "localPath": "patterns/sections/README.md"
+        }
+      ],
+      "css": [
+        {
+          "name": "section",
+          "namePretty": "Section",
+          "filename": "section",
+          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections/section.css",
+          "localPath": "patterns/sections/section.css"
         }
       ]
     }
@@ -534,5 +941,5 @@ const patternManifest_1520832950822 = {
   }
 };
 
-patternBotIncludes(patternManifest_1520832950822);
+patternBotIncludes(patternManifest_1524458125638);
 }());
