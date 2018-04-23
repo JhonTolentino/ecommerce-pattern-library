@@ -1,0 +1,12 @@
+.banner {
+  padding: 5em 2em 4em 2em;
+  text-align: center;
+  position: relative;
+  background-image: url(../../images/banner.jpg);
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+p {
+  color: #fff;
+}
