@@ -388,9 +388,9 @@ const patternBotIncludes = function (manifest) {
 /** 
  * Patternbot library manifest
  * /Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound
- * @version 1524487402116
+ * @version 1524488831931
  */
-const patternManifest_1524487402116 = {
+const patternManifest_1524488831931 = {
   "commonInfo": {
     "modulifier": [
       "responsive",
@@ -511,7 +511,48 @@ const patternManifest_1524487402116 = {
           }
         ]
       },
-      "fonts": {},
+      "fonts": {
+        "primary": {
+          "name": "--font-primary",
+          "namePretty": "Amatic Sc",
+          "raw": "\"Amatic SC\", cursive",
+          "weights": {
+            "normal": {
+              "weight": "normal",
+              "hasNormal": true,
+              "hasItalic": false
+            },
+            "bold": {
+              "weight": "bold",
+              "hasNormal": true,
+              "hasItalic": false
+            }
+          }
+        },
+        "secondary": {
+          "name": "--font-secondary",
+          "namePretty": "Oswald",
+          "raw": "\"Oswald\", sans-serif",
+          "weights": {
+            "300": {
+              "weight": "300",
+              "hasNormal": true,
+              "hasItalic": false
+            },
+            "normal": {
+              "weight": "normal",
+              "hasNormal": true,
+              "hasItalic": false
+            },
+            "bold": {
+              "weight": "bold",
+              "hasNormal": true,
+              "hasItalic": false
+            }
+          }
+        },
+        "accent": []
+      },
       "coloursRaw": {
         "--color-primary": "#fcbeb6",
         "--color-primary-dark": "#f86754",
@@ -520,10 +561,24 @@ const patternManifest_1524487402116 = {
         "--color-secondary-dark": "#909090",
         "--color-secondary-light": "#f2f2f2",
         "--color-third": "#fafafc"
+      },
+      "fontsRaw": {
+        "--font-primary": "\"Amatic SC\", cursive",
+        "--font-secondary": "\"Oswald\", sans-serif"
       }
     },
     "readme": {
-      "attributes": {}
+      "attributes": {
+        "name": "Spell Bound",
+        "fontUrl": "https://fonts.googleapis.com/css?family=Amatic+SC:400,700|Oswald:300,400,700",
+        "backgroundColour": "#fff",
+        "interfaceColours": {
+          "primary": 0,
+          "opposite": 255
+        }
+      },
+      "bodyRaw": "\nSpell Bound is your reliable only stop shop for everything concerning magic spells! We pride ourselves in meeting all our customers expectations and aspirations in the magic field!\n",
+      "bodyBasic": "Spell Bound is your reliable only stop shop for everything concerning magic spells! We pride ourselves in meeting all our customers expectations and aspirations in the magic field!"
     },
     "icons": [
       "alert",
@@ -941,5 +996,5 @@ const patternManifest_1524487402116 = {
   }
 };
 
-patternBotIncludes(patternManifest_1524487402116);
+patternBotIncludes(patternManifest_1524488831931);
 }());
