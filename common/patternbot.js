@@ -86,11 +86,17 @@ const patternBotIncludes = function (manifest) {
     `},
   };
 
+  let jsFileQueue = {
+    sync: [],
+    async: [],
+  };
   let downloadedAssets = {};
 
   const downloadHandler = function (e) {
+    const id = (e.target.hasAttribute('src')) ? e.target.getAttribute('src') : e.target.getAttribute('href');
+
     e.target.removeEventListener('load', downloadHandler);
-    downloadedAssets[e.target.getAttribute('href')] = true;
+    downloadedAssets[id] = true;
   };
 
   const findRootPath = function () {
@@ -115,7 +121,7 @@ const patternBotIncludes = function (manifest) {
     newLink.addEventListener('load', downloadHandler);
 
     document.head.appendChild(newLink);
-  }
+  };
 
   const bindAllCssFiles = function (rootPath) {
     if (manifest.commonInfo && manifest.commonInfo.readme && manifest.commonInfo.readme.attributes &&  manifest.commonInfo.readme.attributes.fontUrl) {
@@ -136,6 +142,54 @@ const patternBotIncludes = function (manifest) {
         addCssFile(`../${css.localPath}`);
       });
     });
+  };
+
+  const queueAllJsFiles = function (rootPath) {
+    if (manifest.patternLibFiles && manifest.patternLibFiles.js) {
+      manifest.patternLibFiles.js.forEach((js) => {
+        const href = `..${manifest.config.commonFolder}/${js.filename}`;
+
+        downloadedAssets[href] = false;
+        jsFileQueue.sync.push(href);
+      });
+    }
+
+    manifest.userPatterns.forEach((pattern) => {
+      if (!pattern.js) return;
+
+      pattern.js.forEach((js) => {
+        const href = `../${js.localPath}`;
+
+        downloadedAssets[href] = false;
+        jsFileQueue.async.push(href);
+      });
+    });
+  };
+
+  const addJsFile = function (href) {
+    const newScript = document.createElement('script');
+
+    newScript.setAttribute('src', href);
+    document.body.appendChild(newScript);
+
+    return newScript;
+  };
+
+  const bindNextJsFile = function (e) {
+    if (e && e.target) {
+      e.target.removeEventListener('load', bindNextJsFile);
+      downloadedAssets[e.target.getAttribute('src')] = true;
+    }
+
+    if (jsFileQueue.sync.length > 0) {
+      const scriptTag = addJsFile(jsFileQueue.sync.shift());
+      scriptTag.addEventListener('load', bindNextJsFile);
+    } else {
+      jsFileQueue.async.forEach((js) => {
+        const scriptTag = addJsFile(js);
+        scriptTag.addEventListener('load', downloadHandler);
+      });
+    }
   };
 
   const getPatternInfo = function (patternElem) {
@@ -368,11 +422,13 @@ const patternBotIncludes = function (manifest) {
 
     rootPath = findRootPath();
     bindAllCssFiles(rootPath);
+    queueAllJsFiles(rootPath);
     allPatternTags = findAllPatternTags();
     allPatterns = constructAllPatterns(rootPath, allPatternTags);
 
     loadAllPatterns(allPatterns).then((allLoadedPatterns) => {
       renderAllPatterns(allPatternTags, allLoadedPatterns);
+      bindNextJsFile();
       hideLoadingScreen();
     }).catch((e) => {
       console.group('Pattern load error');
@@ -387,10 +443,10 @@ const patternBotIncludes = function (manifest) {
 
 /** 
  * Patternbot library manifest
- * /Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound
- * @version 1524458125639
+ * /Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino
+ * @version 220d483f8ec03fc4d485c54f55c2f450d6626bde
  */
-const patternManifest_1524458125638 = {
+const patternManifest_220d483f8ec03fc4d485c54f55c2f450d6626bde = {
   "commonInfo": {
     "modulifier": [
       "responsive",
@@ -543,90 +599,91 @@ const patternManifest_1524458125638 = {
   },
   "patternLibFiles": {
     "commonParsable": {
-      "gridifier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/common/grid.css",
-      "typografier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/common/type.css",
-      "modulifier": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/common/modules.css",
-      "theme": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/common/theme.css"
+      "gridifier": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/common/grid.css",
+      "typografier": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/common/type.css",
+      "modulifier": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/common/modules.css",
+      "theme": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/common/theme.css"
     },
     "imagesParsable": {
-      "icons": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/icons.svg"
+      "icons": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/images/icons.svg"
     },
     "logos": {
-      "sizeLarge": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/logo-256.svg",
-      "size64": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/logo-64.svg",
-      "size32": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/logo-32.svg",
-      "size16": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/images/logo-16.svg",
+      "sizeLarge": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/images/logo-256.svg",
+      "size64": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/images/logo-64.svg",
+      "size32": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/images/logo-32.svg",
+      "size16": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/images/logo-16.svg",
       "size16Local": "logo-16.svg",
       "sizeLargeLocal": "logo-256.svg",
       "size32Local": "logo-32.svg",
       "size64Local": "logo-64.svg"
     },
     "patterns": [
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner",
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons",
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards",
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer",
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms",
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header",
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/navigation",
-      "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections"
+      "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/banner",
+      "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/buttons",
+      "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/cards",
+      "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/footer",
+      "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms",
+      "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/header",
+      "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/navigation",
+      "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/sections"
     ],
     "pages": [
       {
         "name": "about.html",
         "namePretty": "About",
-        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/about.html"
+        "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/pages/about.html"
       },
       {
         "name": "checkout.html",
         "namePretty": "Checkout",
-        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/checkout.html"
+        "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/pages/checkout.html"
       },
       {
         "name": "contact.html",
         "namePretty": "Contact",
-        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/contact.html"
+        "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/pages/contact.html"
       },
       {
         "name": "home.html",
         "namePretty": "Home",
-        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/home.html"
+        "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/pages/home.html"
       },
       {
         "name": "news.html",
         "namePretty": "News",
-        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/news.html"
+        "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/pages/news.html"
       },
       {
         "name": "product.html",
         "namePretty": "Product",
-        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/product.html"
+        "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/pages/product.html"
       },
       {
         "name": "productlist.html",
         "namePretty": "Productlist",
-        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/productlist.html"
+        "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/pages/productlist.html"
       }
-    ]
+    ],
+    "js": []
   },
   "userPatterns": [
     {
       "name": "banner",
       "namePretty": "Banner",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner",
+      "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/banner",
       "html": [
         {
           "name": "banner",
           "namePretty": "Banner",
           "filename": "banner",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner/banner.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/banner/banner.html",
           "localPath": "patterns/banner/banner.html"
         },
         {
           "name": "basic-banner",
           "namePretty": "Basic banner",
           "filename": "basic-banner",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner/basic-banner.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/banner/basic-banner.html",
           "localPath": "patterns/banner/basic-banner.html"
         }
       ],
@@ -635,7 +692,7 @@ const patternManifest_1524458125638 = {
           "name": "readme",
           "namePretty": "Readme",
           "filename": "README",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner/README.md",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/banner/README.md",
           "localPath": "patterns/banner/README.md"
         }
       ],
@@ -644,21 +701,22 @@ const patternManifest_1524458125638 = {
           "name": "banner",
           "namePretty": "Banner",
           "filename": "banner",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/banner/banner.css",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/banner/banner.css",
           "localPath": "patterns/banner/banner.css"
         }
-      ]
+      ],
+      "js": []
     },
     {
       "name": "buttons",
       "namePretty": "Buttons",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons",
+      "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/buttons",
       "html": [
         {
           "name": "buttons",
           "namePretty": "Buttons",
           "filename": "buttons",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons/buttons.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/buttons/buttons.html",
           "localPath": "patterns/buttons/buttons.html"
         }
       ],
@@ -667,7 +725,7 @@ const patternManifest_1524458125638 = {
           "name": "read",
           "namePretty": "Read",
           "filename": "READ",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons/READ.md",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/buttons/READ.md",
           "localPath": "patterns/buttons/READ.md"
         }
       ],
@@ -676,42 +734,43 @@ const patternManifest_1524458125638 = {
           "name": "buttons",
           "namePretty": "Buttons",
           "filename": "buttons",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/buttons/buttons.css",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/buttons/buttons.css",
           "localPath": "patterns/buttons/buttons.css"
         }
-      ]
+      ],
+      "js": []
     },
     {
       "name": "cards",
       "namePretty": "Cards",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards",
+      "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/cards",
       "html": [
         {
           "name": "card",
           "namePretty": "Card",
           "filename": "card",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/card.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/cards/card.html",
           "localPath": "patterns/cards/card.html"
         },
         {
           "name": "feature-card",
           "namePretty": "Feature card",
           "filename": "feature-card",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/feature-card.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/cards/feature-card.html",
           "localPath": "patterns/cards/feature-card.html"
         },
         {
           "name": "product-card",
           "namePretty": "Product card",
           "filename": "product-card",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/product-card.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/cards/product-card.html",
           "localPath": "patterns/cards/product-card.html"
         },
         {
           "name": "product-detail-card",
           "namePretty": "Product detail card",
           "filename": "product-detail-card",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/product-detail-card.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/cards/product-detail-card.html",
           "localPath": "patterns/cards/product-detail-card.html"
         }
       ],
@@ -720,7 +779,7 @@ const patternManifest_1524458125638 = {
           "name": "readme",
           "namePretty": "Readme",
           "filename": "README",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/README.md",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/cards/README.md",
           "localPath": "patterns/cards/README.md"
         }
       ],
@@ -729,21 +788,22 @@ const patternManifest_1524458125638 = {
           "name": "card",
           "namePretty": "Card",
           "filename": "card",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/cards/card.css",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/cards/card.css",
           "localPath": "patterns/cards/card.css"
         }
-      ]
+      ],
+      "js": []
     },
     {
       "name": "footer",
       "namePretty": "Footer",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer",
+      "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/footer",
       "html": [
         {
           "name": "footer",
           "namePretty": "Footer",
           "filename": "footer",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer/footer.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/footer/footer.html",
           "localPath": "patterns/footer/footer.html"
         }
       ],
@@ -752,7 +812,7 @@ const patternManifest_1524458125638 = {
           "name": "readme",
           "namePretty": "Readme",
           "filename": "README",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer/README.md",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/footer/README.md",
           "localPath": "patterns/footer/README.md"
         }
       ],
@@ -761,63 +821,64 @@ const patternManifest_1524458125638 = {
           "name": "footer",
           "namePretty": "Footer",
           "filename": "footer",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/footer/footer.css",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/footer/footer.css",
           "localPath": "patterns/footer/footer.css"
         }
-      ]
+      ],
+      "js": []
     },
     {
       "name": "forms",
       "namePretty": "Forms",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms",
+      "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms",
       "html": [
         {
           "name": "checkbox",
           "namePretty": "Checkbox",
           "filename": "checkbox",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/checkbox.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms/checkbox.html",
           "localPath": "patterns/forms/checkbox.html"
         },
         {
           "name": "email",
           "namePretty": "Email",
           "filename": "email",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/email.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms/email.html",
           "localPath": "patterns/forms/email.html"
         },
         {
           "name": "name",
           "namePretty": "Name",
           "filename": "name",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/name.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms/name.html",
           "localPath": "patterns/forms/name.html"
         },
         {
           "name": "number",
           "namePretty": "Number",
           "filename": "number",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/number.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms/number.html",
           "localPath": "patterns/forms/number.html"
         },
         {
           "name": "password",
           "namePretty": "Password",
           "filename": "password",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/password.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms/password.html",
           "localPath": "patterns/forms/password.html"
         },
         {
           "name": "phone-number",
           "namePretty": "Phone number",
           "filename": "phone-number",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/phone-number.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms/phone-number.html",
           "localPath": "patterns/forms/phone-number.html"
         },
         {
           "name": "radio-buttons",
           "namePretty": "Radio buttons",
           "filename": "radio-buttons",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/radio-buttons.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms/radio-buttons.html",
           "localPath": "patterns/forms/radio-buttons.html"
         }
       ],
@@ -827,21 +888,22 @@ const patternManifest_1524458125638 = {
           "name": "forms",
           "namePretty": "Forms",
           "filename": "forms",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/forms/forms.css",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/forms/forms.css",
           "localPath": "patterns/forms/forms.css"
         }
-      ]
+      ],
+      "js": []
     },
     {
       "name": "header",
       "namePretty": "Header",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header",
+      "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/header",
       "html": [
         {
           "name": "header",
           "namePretty": "Header",
           "filename": "header",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header/header.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/header/header.html",
           "localPath": "patterns/header/header.html"
         }
       ],
@@ -850,7 +912,7 @@ const patternManifest_1524458125638 = {
           "name": "readme",
           "namePretty": "Readme",
           "filename": "README",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header/README.md",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/header/README.md",
           "localPath": "patterns/header/README.md"
         }
       ],
@@ -859,21 +921,22 @@ const patternManifest_1524458125638 = {
           "name": "header",
           "namePretty": "Header",
           "filename": "header",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/header/header.css",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/header/header.css",
           "localPath": "patterns/header/header.css"
         }
-      ]
+      ],
+      "js": []
     },
     {
       "name": "navigation",
       "namePretty": "Navigation",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/navigation",
+      "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/navigation",
       "html": [
         {
           "name": "nav",
           "namePretty": "Nav",
           "filename": "nav",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/navigation/nav.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/navigation/nav.html",
           "localPath": "patterns/navigation/nav.html"
         }
       ],
@@ -883,21 +946,22 @@ const patternManifest_1524458125638 = {
           "name": "nav",
           "namePretty": "Nav",
           "filename": "nav",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/navigation/nav.css",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/navigation/nav.css",
           "localPath": "patterns/navigation/nav.css"
         }
-      ]
+      ],
+      "js": []
     },
     {
       "name": "sections",
       "namePretty": "Sections",
-      "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections",
+      "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/sections",
       "html": [
         {
           "name": "section",
           "namePretty": "Section",
           "filename": "section",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections/section.html",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/sections/section.html",
           "localPath": "patterns/sections/section.html"
         }
       ],
@@ -906,7 +970,7 @@ const patternManifest_1524458125638 = {
           "name": "readme",
           "namePretty": "Readme",
           "filename": "README",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections/README.md",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/sections/README.md",
           "localPath": "patterns/sections/README.md"
         }
       ],
@@ -915,10 +979,11 @@ const patternManifest_1524458125638 = {
           "name": "section",
           "namePretty": "Section",
           "filename": "section",
-          "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/patterns/sections/section.css",
+          "path": "/Users/petravaneeghen/Documents/Documents - Petra’s MacBook Pro 2017/Semester 2/Semester 3/Semester 4/Web Dev 4/ecommerce-pattern-library-JhonTolentino/patterns/sections/section.css",
           "localPath": "patterns/sections/section.css"
         }
-      ]
+      ],
+      "js": []
     }
   ],
   "config": {
@@ -941,5 +1006,5 @@ const patternManifest_1524458125638 = {
   }
 };
 
-patternBotIncludes(patternManifest_1524458125638);
+patternBotIncludes(patternManifest_220d483f8ec03fc4d485c54f55c2f450d6626bde);
 }());
