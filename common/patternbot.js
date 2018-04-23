@@ -388,9 +388,9 @@ const patternBotIncludes = function (manifest) {
 /** 
  * Patternbot library manifest
  * /Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound
- * @version 1524483982083
+ * @version 1524485329968
  */
-const patternManifest_1524483982083 = {
+const patternManifest_1524485329968 = {
   "commonInfo": {
     "modulifier": [
       "responsive",
@@ -596,11 +596,6 @@ const patternManifest_1524483982083 = {
         "name": "news.html",
         "namePretty": "News",
         "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/news.html"
-      },
-      {
-        "name": "product.html",
-        "namePretty": "Product",
-        "path": "/Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound/pages/product.html"
       },
       {
         "name": "productlist.html",
@@ -941,5 +936,5 @@ const patternManifest_1524483982083 = {
   }
 };
 
-patternBotIncludes(patternManifest_1524483982083);
+patternBotIncludes(patternManifest_1524485329968);
 }());
