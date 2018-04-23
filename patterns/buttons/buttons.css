@@ -1,54 +1,49 @@
 .btn {
+  padding-left: 2em;
+  padding-right: 2em;
+
   background-color: var(--color-secondary);
   border-color: var(--color-secondary);
 
   color: #fff;
+  font-family: var(--font-secondary);
 
   border-radius: 0.2em;
-  padding: 10px 24px;
   text-decoration: none;
   text-align: center;
-}
-
-.btn-light {
-  background-color: var(--color-third);
-  border-color: var(--color-third);
-
-  color: #fff;
-  border-radius: 0.2em;
-  padding: 0.7em 1.7em;
-  text-decoration: none;
-  text-align: center;
-}
-
-.btn-ghost {
-  background-color: transparent;
-  border-color: var(--color-third);
-
-  color: #fff;
-  border-radius: 0.2em;
-  padding: 0.7em 1.7em;
-  text-decoration: none;
-    text-align: center;
 }
 
 .btn:hover {
-  background-color: black;
-  border-color: black;
+  background-color: var(--color-secondary-dark);
+  border-color: var(--color-secondary-dark);
 
-  color: var(--color-primary);
+  color: #fff;
+}
+
+.btn-light {
+  background-color: var(--color-secondary-light);
+  border-color: var(--color-secondary-light);
+
+  color: var(--color-secondary);
 }
 
 .btn-light:hover {
-  background-color: var(--color-secondary);
-  border-color: var(--color-secondary);
+  background-color: #fff;
+  border-color: #fff;
 
-  color: var(--color-primary);
+  color: var(--color-secondary);
+}
+
+
+.btn-ghost {
+  background-color: transparent;
+
+  color: var(--color-secondary);
 }
 
 .btn-ghost:hover {
-  background-color: transparent;
+  background-color: var(--color-secondary);
   border-color: var(--color-secondary);
 
-  color: var(--color-primary);
+  color: #fff;
 }
