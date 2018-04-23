@@ -1,0 +1,10 @@
+.footer {
+  height: 8.5em;
+  border-bottom: .5em solid var(--color-primary-dark);
+  background-image: url(../../images/footer.jpg);
+  background-size: contain;
+}
+
+p {
+  color: #000;
+}
