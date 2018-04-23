@@ -1,0 +1,13 @@
+.masthead {
+  border-top: .5em solid var(--color-primary-dark);
+  text-align: center;
+}
+
+ .nav li {
+   position: relative;
+ }
+
+ span {
+   font-family: var(--font-primary);
+   color: var(--color-primary-dark);
+ }
