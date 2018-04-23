@@ -16,19 +16,56 @@
     }
   </script>
 
-  <div class="island-2 pad-t-2 pad-b-2">
-    <script type="application/json" data-pattern="forms/name"></script>
-    <script type="application/json" data-pattern="forms/email"></script>
-    <script type="application/json" data-pattern="forms/phone-number"></script>
-    <div class="island-1-2">
-      <script type="application/json" data-pattern="cards/product-card"></script>
+  <div class="grid island-2">
+    <div class="unit xs-1 s-1 m-1-2 l-1-2 push gutter-1-2">
+      <script type="application/json" data-pattern="forms/name"></script>
     </div>
-    <script type="application/json" data-pattern="forms/number">
-      {
-        "label": "Quantity of the product:"
-      }
-    </script>
-    <script type="application/json" data-pattern="forms/radio-buttons"></script>
+
+    <div class="unit xs-1 s-1 m-1-2 l-1-2 push gutter-1-2">
+      <script type="application/json" data-pattern="forms/name">
+        {
+          "label": "Street Address",
+          "p": "Your current address"
+        }
+      </script>
+    </div>
+
+    <div class="unit xs-1 s-1 m-1-2 l-1-2 push gutter-1-2">
+      <script type="application/json" data-pattern="forms/name">
+        {
+          "label": "City",
+          "p": "Your current city"
+        }
+      </script>
+    </div>
+
+    <div class="unit xs-1 s-1 m-1-2 l-1-2 push gutter-1-2">
+      <script type="application/json" data-pattern="forms/email"></script>
+    </div>
+
+    <div class="unit xs-1 s-1 m-1-2 l-1-2 push gutter-1-2">
+      <script type="application/json" data-pattern="forms/phone-number"></script>
+    </div>
+
+    <div class="unit xs-1 s-1 m-1-2 l-1-2 push gutter-1-2">
+      <script type="application/json" data-pattern="forms/number">
+        {
+          "label": "Quantity of the product:"
+        }
+      </script>
+    </div>
+
+    <div class="unit xs-1 s-1 m-1 l-1 push gutter-1-2">
+      <script type="application/json" data-pattern="forms/radio-buttons"></script>
+    </div>
+
+    <div class="unit xs-1 s-1 m-1 l-1 gutter-1-2">
+      <script type="application/json" data-pattern="cards/product-detail-card">
+        {
+          "a": "Submit Order"
+        }
+      </script>
+    </div>
   </div>
 
   <script type="application/json" data-pattern="footer/footer"></script>
