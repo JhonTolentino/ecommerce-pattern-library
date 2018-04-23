@@ -1,0 +1,9 @@
+span {
+  color: var(--color-primary-dark);
+}
+
+.error-message {
+  display: none;
+  background-color: var(--color-primary-dark);
+  color: var(--color-secondary-light);
+}
