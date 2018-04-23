@@ -13,6 +13,7 @@ fonts:
 colors:
   primary: |
   Use the primary color only for the background to help pop content to the forefront.
+
   secondary: |
   Use the secondary color for headers to help slowly decrease the amount of attention they hold on pages.
 ---

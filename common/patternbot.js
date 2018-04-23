@@ -388,9 +388,9 @@ const patternBotIncludes = function (manifest) {
 /** 
  * Patternbot library manifest
  * /Users/Goonie/Documents/Graphic Design/Semester 4/wed-dev-4/Main/SpellBound
- * @version 1524458125639
+ * @version 1524483982083
  */
-const patternManifest_1524458125638 = {
+const patternManifest_1524483982083 = {
   "commonInfo": {
     "modulifier": [
       "responsive",
@@ -941,5 +941,5 @@ const patternManifest_1524458125638 = {
   }
 };
 
-patternBotIncludes(patternManifest_1524458125638);
+patternBotIncludes(patternManifest_1524483982083);
 }());
